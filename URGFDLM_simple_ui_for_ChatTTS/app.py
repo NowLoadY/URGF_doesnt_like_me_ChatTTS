@@ -11,7 +11,7 @@ import soundfile as sf
 import tempfile
 import numpy as np
 import os
-
+from pydub import AudioSegment
 os.makedirs('generated_audios', exist_ok=True)
 
 seeds = {
@@ -84,8 +84,8 @@ BoxLayout:
             Slider:
                 id: max_word_slider
                 min: 5
-                max: 50
-                value: 20
+                max: 200
+                value: 100
                 step: 1
                 orientation: 'horizontal'
                 on_value: app.set_max_word(self.value)
@@ -110,10 +110,9 @@ class ChatApp(App):
         self.skip_refine_text = False
         self.use_decoder = True
         self.using_seed = 0
-        self.max_word=30
+        self.max_word=100
         layout = Builder.load_string(kivy_ui_struct)
         
-        # 绑定UI元素
         self.custom_seed_input = layout.ids.custom_seed_input
         self.speaker_spinner = layout.ids.speaker_spinner
         self.input_text = layout.ids.input_text
@@ -123,15 +122,14 @@ class ChatApp(App):
         self.audio_list = layout.ids.audio_list
         self.max_word_slider = layout.ids.max_word_slider
 
-        # 设置参数
         self.max_word_slider.value = self.max_word
         
-        # 绑定事件
         self.speaker_spinner.bind(text=self.on_speaker_select)
         self.submit_button.bind(on_press=self.infer_and_play)
         self.switch1.bind(active=self.toggle_skip_refine_text)
         self.switch2.bind(active=self.toggle_use_decoder)
-        
+
+        self.initialize_audio_list()
         return layout
     
     def set_max_word(self, value):
@@ -151,8 +149,14 @@ class ChatApp(App):
         self.deterministic(seed)
         self.rnd_spk_emb = self.chat.sample_random_speaker()
 
+    def adjust_pitch(self, audio_path, new_pitch=0):
+        sound = AudioSegment.from_file(audio_path)
+        new_sound = sound._spawn(sound.raw_data, overrides={
+            "frame_rate": int(sound.frame_rate * (2.0 ** (new_pitch / 12.0)))
+        }).set_frame_rate(sound.frame_rate)
+        new_sound.export(audio_path, format="wav")
+    
     def infer_and_play(self, instance=None):
-        # 如果用户自定义seed，则使用该seed
         custom_seed = self.custom_seed_input.text.strip()
         if custom_seed.isdigit():
             self.choose_speaker(int(custom_seed))
@@ -160,11 +164,9 @@ class ChatApp(App):
         text = self.input_text.text
         
         if len(text) > self.max_word:
-            # 按标点符号分句
             sentences = re.split(r'(?<=[。！？;；.!?;,，])', text)
             sentences = [s.strip() for s in sentences if s.strip() != '']
 
-            # 合并过短的句子接近max_word个字符
             combined_sentences = []
             temp_sentence = ""
             for sentence in sentences:
@@ -174,24 +176,30 @@ class ChatApp(App):
                     if temp_sentence:
                         combined_sentences.append(temp_sentence)
                     temp_sentence = sentence
-            if temp_sentence:  # 添加最后一个句子，如果有
+            if temp_sentence:
                 combined_sentences.append(temp_sentence)
 
             sentences = combined_sentences
         else:
             sentences = [text]
+
+        sentences = [re.sub(r'[^\w\[\]]', '', s) for s in sentences]
         combined_wav = []
         for sentence in sentences:
             params_infer_code = {
                 'spk_emb': self.rnd_spk_emb,
+
             }
+            params_refine_text = {
+            'prompt': '[oral_0]'
+            } 
             wav = self.chat.infer(sentence,
+                                params_refine_text=params_refine_text,
                                 params_infer_code=params_infer_code,
                                 use_decoder=self.use_decoder,
                                 skip_refine_text=self.skip_refine_text)[0][0]
             combined_wav.append(wav)
 
-        # 合并音频
         if len(combined_wav) > 1:
             combined_wav = np.concatenate(combined_wav)
         else:
@@ -202,15 +210,29 @@ class ChatApp(App):
         temp_audio_file.close()
         self.play_audio(temp_audio_file.name)
         button_text = "seed:{}_".format(self.using_seed) + self.input_text.text[:10] + "..."
-        self.add_audio_to_list(button_text, temp_audio_file.name)  # 添加音频到列表
+        self.add_audio_to_list(button_text, temp_audio_file.name)
 
     def play_audio(self, filename):
+        self.adjust_pitch(filename)
         sound = SoundLoader.load(filename)
         if sound:
             sound.play()
 
+    def initialize_audio_list(self):
+        audio_files = os.listdir('generated_audios')
+        for filename in audio_files:
+            if filename.endswith('.wav'):
+                button_text = "seed:{}_".format(filename.split("_")[1]) + filename.split("_")[2][:10] + "..."
+                self.add_audio_to_list(button_text, os.path.join('generated_audios', filename))
+
     def add_audio_to_list(self, button_text, filename):
+        existing_files = set(os.listdir('generated_audios'))
+        for child in list(self.audio_list.children):
+            if not os.path.basename(child.filename) in existing_files:
+                self.audio_list.remove_widget(child)
+
         btn = Button(text=button_text, size_hint_y=None, height=50, width=200, font_name='msyh')
+        btn.filename = filename
         btn.bind(on_press=lambda instance: self.play_audio(filename))
         self.audio_list.add_widget(btn)
         
