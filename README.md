@@ -11,9 +11,13 @@ python app.py
 
 
 # Example
+```text
+好大的雨[uv_break]浑身都湿透了[lbreak]你女朋友不在家的话[uv_break]能借用你们洗手间吗
+```
 https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/16936b91-4dbe-4d6a-b154-f22418ed1aab
-
-
+```text
+你去哄她吧[uv_break]我没事[lbreak]真的没事[laugh]只是有点难过
+```
 https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/e7b75230-c8cd-43da-9c62-5407a94c7d61
 
 
