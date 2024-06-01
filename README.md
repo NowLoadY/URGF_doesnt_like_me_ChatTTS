@@ -28,6 +28,11 @@ https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/e7b75230
 呀！姐姐好像生气了，你快去把她追回来吧。我没事的，我自己打车回家就可以了。
 ```
 https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/2521d22d-e247-4e50-a30f-2e79d7b1ef24
+```text
+你女朋友要是多想了，我微信可以把你删掉的[uv_break]你们别因为我吵架啊！
+```
+https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/7b48c1ee-faab-41bb-b761-3c20c70f5f1c
+
 
 
 
