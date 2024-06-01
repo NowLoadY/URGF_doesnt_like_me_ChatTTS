@@ -32,6 +32,11 @@ https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/2521d22d
 你女朋友要是多想了，我微信可以把你删掉的[uv_break]你们别因为我吵架啊！
 ```
 https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/7b48c1ee-faab-41bb-b761-3c20c70f5f1c
+```text
+昨天晚上[uv_break]给你发短信的时候还小小的期待过你会马上回我电话呢。[lbreak]那个时候是在陪女朋友吧？她有你这样的男生陪着[lbreak]真的好幸福哦
+```
+https://github.com/NowLoadY/URGF_doesnt_like_me_ChatTTS/assets/79356856/082f5ce4-839c-428b-95d0-b06994361cc9
+
 
 
 
